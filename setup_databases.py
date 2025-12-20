@@ -77,7 +77,7 @@ async def setup_databases():
                     DO $$
                     BEGIN
                         IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'team_role') THEN
-                            CREATE TYPE team_role AS ENUM ('member', 'moderator', 'admin');
+                            CREATE TYPE team_role AS ENUM ('member', 'moderator', 'admin', 'owner');
                         END IF;
                     END$$;
                 ''')
