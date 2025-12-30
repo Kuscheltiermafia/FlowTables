@@ -22,8 +22,7 @@ async def create_user_post(
     firstName: str = Form(...),
     lastName: str = Form(...),
     email: str = Form(...),
-    password: str = Form(...),
-    conn: Connection = Depends(get_user_pool)
+    password: str = Form(...)
 ):
     user = User(userName, firstName, lastName, email, password)
     usr_id = await create_user(conn ,userName, firstName, lastName, email, password)
