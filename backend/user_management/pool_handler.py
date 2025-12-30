@@ -33,3 +33,7 @@ async def close_user_pool():
     if user_pool is not None:
         await user_pool.close()
         user_pool = None
+
+async def get_user_pool():
+    async with user_pool.acquire() as conn:
+        yield conn

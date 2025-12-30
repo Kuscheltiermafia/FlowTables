@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, Depends
 from pydantic import BaseModel
 from dataclasses import dataclass
+
+from backend.user_management.pool_handler import user_pool, get_user_pool
 from backend.user_management.user_handler import *
 
 
@@ -20,9 +22,10 @@ async def create_user_post(
     firstName: str = Form(...),
     lastName: str = Form(...),
     email: str = Form(...),
-    password: str = Form(...)
+    password: str = Form(...),
+    conn: Connection = Depends(get_user_pool)
 ):
     user = User(userName, firstName, lastName, email, password)
-    usr_id = await create_user(userName, firstName, lastName, email, password)
+    usr_id = await create_user(conn ,userName, firstName, lastName, email, password)
     print(usr_id)
     return {"created_user": user.__dict__}
