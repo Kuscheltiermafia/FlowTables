@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowTables Login</title>
+    <style>
+        :root {
+            /* Palette from Style Guide */
+            --primary: #1f9feb;
+            --secondary: #00c0b3;
+            --text-dark: #1F3A63;
+            --text-light: #64748b;
+            --bg-page: #F8FAFC;
+            --bg-input: #F1F5F9;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+            
+            /* Animation */
+            --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-page);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- CARD CONTAINER --- */
+        .card {
+            background: var(--surface);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 50px -12px rgba(31, 58, 99, 0.1);
+            position: relative;
+            /* Height animates to fit content */
+            transition: height 0.4s var(--ease);
+            overflow: hidden; /* Ensures contents don't spill out */
+        }
+
+        /* --- LOGO --- */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -1px;
+        }
+
+        .logo-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary);
+            border-radius: 50%;
+        }
+
+        /* --- TOGGLE SWITCH --- */
+        .toggle-container {
+            background-color: var(--bg-input);
+            padding: 4px;
+            border-radius: 12px;
+            display: flex;
+            position: relative;
+            margin-bottom: 35px;
+        }
+
+        /* The sliding white pill */
+        .toggle-pill {
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            bottom: 4px;
+            width: calc(50% - 4px);
+            background: white;
+            border-radius: 9px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.3s var(--ease);
+            z-index: 1;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s;
+            user-select: none;
+        }
+
+        .toggle-btn.active {
+            color: var(--text-dark);
+        }
+
+        /* --- SLIDING FORMS --- */
+        .viewport {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .forms-track {
+            display: flex;
+            width: 200%;
+            transition: transform 0.4s var(--ease);
+        }
+
+        .form-slide {
+            width: 50%;
+            padding: 2px; /* Prevent outline clipping */
+        }
+
+        /* --- INPUTS --- */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: var(--bg-input);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input::placeholder {
+            color: #cbd5e1;
+        }
+
+        .input:focus {
+            background-color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(31, 159, 235, 0.1);
+        }
+
+        /* Grid for names */
+        .grid-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* --- BUTTONS & FOOTER --- */
+        .btn {
+            width: 100%;
+            background-color: var(--text-dark);
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .link:hover { text-decoration: underline; }
+
+        /* Custom Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .checkbox-container input { display: none; }
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .checkbox-container input:checked + .checkmark {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        .checkbox-container input:checked + .checkmark::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            font-size: 12px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="card" id="mainCard">
+        
+        <div class="header">
+            <div class="logo">
+                <div class="logo-dot"></div>
+                FlowTables
+            </div>
+        </div>
+
+        <div class="toggle-container">
+            <div class="toggle-pill" id="pill"></div>
+            <div class="toggle-btn active" id="btnLog" onclick="toggle('login')">Log In</div>
+            <div class="toggle-btn" id="btnSign" onclick="toggle('signup')">Sign Up</div>
+        </div>
+
+        <div class="viewport">
+            <div class="forms-track" id="track">
+                
+                <div class="form-slide" id="slideLogin">
+                    <form action="/login" method="post">
+                        <div class="input-group">
+                            <label class="label">Email</label>
+                            <input type="email" class="input" placeholder="name@company.com" name="username">
+                        </div>
+                        <div class="input-group">
+                            <label class="label">Password</label>
+                            <input type="password" class="input" placeholder="••••••••" name="password">
+                        </div>
+                        
+                        <button class="btn">Sign In</button>
+
+                        <div class="footer-actions">
+                            <label class="checkbox-container">
+                                <input type="checkbox">
+                                <div class="checkmark"></div>
+                                Remember me
+                            </label>
+                            <a href="#" class="link">Forgot password?</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="form-slide" id="slideSignup">
+                    <form action="/api/users/create_user" method="post">
+                        <div class="input-group">
+                            <label class="label">Username</label>
+                            <input type="text" class="input" placeholder="@username" name="userName">
+                        </div>
+                        
+                        <div class="grid-row">
+                            <div class="input-group" style="width:50%">
+                                <label class="label">First Name</label>
+                                <input type="text" class="input" placeholder="Jane" name="firstName">
+                            </div>
+                            <div class="input-group" style="width:50%">
+                                <label class="label">Last Name</label>
+                                <input type="text" class="input" placeholder="Doe" name="lastName">
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label class="label">Work Email</label>
+                            <input type="email" class="input" placeholder="name@company.com" name="email">
+                        </div>
+
+                        <div class="input-group">
+                            <label class="label">Password</label>
+                            <input type="password" class="input" placeholder="Create a password" name="password">
+                        </div>
+
+                        <button class="btn">Create Account</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const card = document.getElementById('mainCard');
+        const track = document.getElementById('track');
+        const pill = document.getElementById('pill');
+        const btnLog = document.getElementById('btnLog');
+        const btnSign = document.getElementById('btnSign');
+        const slideLogin = document.getElementById('slideLogin');
+        const slideSignup = document.getElementById('slideSignup');
+
+        // Constant to account for padding (top 40 + bottom 40) + header/toggle height
+        // We calculate dynamically to be safe
+        function adjustHeight(activeSlide) {
+            // Get the height of the content inside the slide
+            const contentHeight = activeSlide.scrollHeight; 
+            // Add the height of the static header elements (Logo + Toggle + margins) ~ approx 135px
+            // This 135px is the "overhead" of the card outside the slider
+            const headerHeight = 135; 
+            const padding = 80; 
+            
+            card.style.height = `${contentHeight + headerHeight + padding}px`;
+        }
+
+        function toggle(mode) {
+            if (mode === 'login') {
+                // UI
+                btnLog.classList.add('active');
+                btnSign.classList.remove('active');
+                
+                // Animation
+                pill.style.transform = 'translateX(0)';
+                track.style.transform = 'translateX(0)';
+                
+                adjustHeight(slideLogin);
+            } else {
+                // UI
+                btnSign.classList.add('active');
+                btnLog.classList.remove('active');
+                
+                // Animation: Move pill 100% of its own width + 8px for the gap/padding compensation
+                pill.style.transform = 'translateX(100%) translateX(8px)'; 
+                track.style.transform = 'translateX(-50%)';
+                
+                adjustHeight(slideSignup);
+            }
+        }
+
+        // Init
+        window.addEventListener('load', () => {
+            adjustHeight(slideLogin);
+        });
+    </script>
+</body>
+</html>

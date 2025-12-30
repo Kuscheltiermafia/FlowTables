@@ -17,7 +17,7 @@ class User:
     password: str
 
 @router.post("/create_user")
-async def create_user_post(
+async def api_users_create_user_post(
     userName: str = Form(...),
     firstName: str = Form(...),
     lastName: str = Form(...),

@@ -5,12 +5,14 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
 import os
 from backend.routes import api
+from backend.routes import user
 from backend.data_management.pool_handler import init_data_pool, close_data_pool
 from backend.user_management.pool_handler import init_user_pool, close_user_pool
 from contextlib import asynccontextmanager 
 import time
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.middleware.sessions import SessionMiddleware
 
 
 @asynccontextmanager
@@ -45,6 +47,8 @@ app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(api.api_router)
+app.include_router(user.user_router)
+app.add_middleware(SessionMiddleware, secret_key="SecretKey")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -76,20 +80,24 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index(request: Request, message: str = "null"):
+    if "logged_in" in request.session and request.session["logged_in"] == True:
+        logg_status = "true"
+    else:
+        logg_status = "false"
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "cache_buster": int(time.time())} 
+        {"request": request, "cache_buster": int(time.time()), "message": message, "logg_status": logg_status} 
     )
 
 @app.get("/favicon")
 
-@app.get("/tests", response_class=HTMLResponse)
-async def tests_url(request: Request):
-    return templates.TemplateResponse(
-        "tests.html",
-        {"request": request, "cache_buster": int(time.time())} 
-    )
+# @app.get("/tests", response_class=HTMLResponse)
+# async def tests_url(request: Request):
+#     return templates.TemplateResponse(
+#         "tests.html",
+#         {"request": request, "cache_buster": int(time.time())} 
+#     )
 
 
 @app.get("/secret")
