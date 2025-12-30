@@ -29,16 +29,16 @@ async def lifespan(app: FastAPI):
 
 
 ERROR_DETAILS = {
-    400: ("Ungültige Anfrage (Bad Request)", "Der Server konnte Ihre Anfrage aufgrund fehlerhafter Syntax oder ungültiger Daten nicht verarbeiten. Bitte korrigieren Sie die Anfrage."),
-    401: ("Nicht autorisiert (Unauthorized)", "Für diese Aktion ist eine gültige Authentifizierung (Zugangsdaten) erforderlich. Bitte melden Sie sich an."),
-    403: ("Zugriff verboten (Forbidden)", "Sie sind authentifiziert, haben aber nicht die notwendigen Berechtigungen, um auf diese Ressource zuzugreifen."),
-    404: ("Seite nicht gefunden (Not Found)", "Die von Ihnen angeforderte Adresse oder Ressource konnte nicht gefunden werden. Überprüfen Sie bitte die URL."),
-    405: ("Methode nicht erlaubt (Method Not Allowed)", "Die verwendete HTTP-Methode (z.B. GET, POST) ist für diesen Endpunkt unzulässig."),
-    422: ("Unverarbeitbare Entität (Unprocessable Entity)", "Die Anfrage ist syntaktisch korrekt, aber semantisch fehlerhaft (häufig bei Validierungsfehlern in FastAPI)."),
-    429: ("Zu viele Anfragen (Too Many Requests)", "Sie haben zu viele Anfragen in kurzer Zeit gesendet. Bitte warten Sie einen Augenblick, bevor Sie es erneut versuchen."),
-    500: ("Interner Serverfehler (Internal Server Error)", "Ein unerwarteter Fehler ist auf dem Server aufgetreten. Das Problem wird untersucht und behoben."),
-    503: ("Dienst nicht verfügbar (Service Unavailable)", "Der Dienst ist momentan wegen Wartungsarbeiten oder Überlastung nicht erreichbar. Bitte versuchen Sie es später erneut."),
-    504: ("Gateway-Zeitüberschreitung (Gateway Timeout)", "Der Server hat von einem vorgeschalteten Dienst keine rechtzeitige Antwort erhalten."),
+    400: ("400", "Der Server konnte Ihre Anfrage aufgrund fehlerhafter Syntax oder ungültiger Daten nicht verarbeiten. Bitte korrigieren Sie die Anfrage."),
+    401: ("401", "Für diese Aktion ist eine gültige Authentifizierung (Zugangsdaten) erforderlich. Bitte melden Sie sich an."),
+    403: ("403", "Sie sind authentifiziert, haben aber nicht die notwendigen Berechtigungen, um auf diese Ressource zuzugreifen."),
+    404: ("404", "Die von Ihnen angeforderte Adresse oder Ressource konnte nicht gefunden werden. Überprüfen Sie bitte die URL."),
+    405: ("405", "Die verwendete HTTP-Methode (z.B. GET, POST) ist für diesen Endpunkt unzulässig."),
+    422: ("422", "Die Anfrage ist syntaktisch korrekt, aber semantisch fehlerhaft (häufig bei Validierungsfehlern in FastAPI)."),
+    429: ("429", "Sie haben zu viele Anfragen in kurzer Zeit gesendet. Bitte warten Sie einen Augenblick, bevor Sie es erneut versuchen."),
+    500: ("500", "Ein unerwarteter Fehler ist auf dem Server aufgetreten. Das Problem wird untersucht und behoben."),
+    503: ("503", "Der Dienst ist momentan wegen Wartungsarbeiten oder Überlastung nicht erreichbar. Bitte versuchen Sie es später erneut."),
+    504: ("504", "Der Server hat von einem vorgeschalteten Dienst keine rechtzeitige Antwort erhalten."),
 }
 
 app = FastAPI(lifespan=lifespan)
@@ -50,11 +50,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    """
-    Behandelt alle HTTP-Exceptions, ruft die Fehlerdetails ab und rendert
-    das 'error.html' Template mit der TemplateResponse, um den korrekten
-    Statuscode zu gewährleisten.
-    """
+
     status_code = exc.status_code
     
     # 1. Titel und Standardbeschreibung abrufen

@@ -1,146 +1,104 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{{ STATUS_CODE }} - {{ TITLE }}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* ---------------------------------- */
-    /* Custom Variables & Global Styles   */
-    /* ---------------------------------- */
-    :root{
-      --bg-a:#1a4f78;
-      --bg-b:#005f56;
-      --primary:#1f9feb;
-      --glass-top: rgba(255,255,255,0.06);
-      --glass-mid: rgba(255,255,255,0.03);
-      --glass-border: rgba(255,255,255,0.12);
-      --radius:28px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ TITLE }} - Ein Fehler ist aufgetreten</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --text-main: #2d3436;
+            --text-secondary: #636e72;
+            --accent: #0984e3;
+            --card-bg: #ffffff;
+        }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-      background: linear-gradient(135deg,var(--bg-a) 0%, var(--bg-b) 100%);
-      color:#e6eef7;
-      display:grid;
-      place-items:center;
-      padding:1.5rem;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      animation:pageFadeIn 520ms ease both;
-      overflow-y:auto;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    @keyframes pageFadeIn{
-      from{opacity:0;transform:translateY(8px)}
-      to{opacity:1;transform:none}
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
 
-    .wrap{
-      width:100%;
-      max-width:800px; /* Adjusted max width */
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:1rem;
-    }
+        .container {
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
 
-    /* ---------------------------------- */
-    /* Liquid Glass Card Styling          */
-    /* ---------------------------------- */
-    .card{
-      position:relative;
-      width:min(800px,96%);
-      border-radius:var(--radius);
-      padding:3rem 2.5rem; /* Increased padding */
-      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
-      border: 1px solid rgba(255,255,255,0.06);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.45) inset;
-      backdrop-filter: blur(30px) saturate(130%) brightness(0.9);
-      -webkit-backdrop-filter: blur(30px) saturate(130%) brightness(0.9);
-      overflow:hidden;
-      transition:transform 220ms ease;
-      text-align: center; /* Center content within the card */
-    }
+        .error-code {
+            font-size: 8rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 1rem;
+            letter-spacing: -5px;
+            background: linear-gradient(135deg, #1f9feb 57%, #00c0b3 25%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0.8;
+        }
 
-    /* Glass Effects */
-    .card::before, .card::after{
-      content:"";position:absolute;left:0;right:0;height:45%;pointer-events:none;border-radius:inherit;
-    }
-    .card::before{
-      top:0;background: linear-gradient(180deg, var(--glass-top), rgba(255,255,255,0));mix-blend-mode: screen;opacity:0.9;transform:translateY(-6%);filter:blur(10px);
-    }
-    .card::after{
-      bottom:0;background: linear-gradient(180deg, rgba(255,255,255,0.01), var(--glass-mid));mix-blend-mode: overlay;opacity:0.7;filter:blur(6px);
-    }
-    .rim{
-      position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01) 30%, rgba(31,159,235,0.06) 60%, rgba(255,255,255,0.008));
-      mix-blend-mode:overlay;border:1px solid var(--glass-border);
-    }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
 
-    .content{
-      position:relative;z-index:2;
-    }
-    
-    /* Code and Metadata Layout (Simplified) */
-    .code{
-      font-weight:800;
-      font-size:clamp(60px,12vw,120px); /* Larger code for focus */
-      line-height:1;
-      color:rgba(255,255,255,0.92);
-      text-shadow: 0 6px 28px rgba(0,0,0,0.6);
-      margin-bottom:1.5rem;
-      -webkit-text-stroke:0.2px rgba(0,0,0,0.25);
-    }
-    
-    h1{margin:0 0 0.75rem 0;font-size:clamp(22px,3vw,32px)} /* Larger title */
-    p{margin:0 0 2rem 0;color:rgba(230,238,247,0.9);font-size:clamp(16px, 1.5vw, 18px);} /* Larger text */
+        .description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+        }
 
-    .btn{
-      display:inline-flex;align-items:center;gap:0.6rem;background:linear-gradient(180deg,var(--primary),color-mix(in srgb, var(--primary) 82%, black 18%));color:#032a3a;padding:0.72rem 1.05rem;font-weight:700;border-radius:12px;cursor:pointer;text-decoration:none;box-shadow:0 10px 30px rgba(31,159,235,0.12);
-      transition:transform 100ms ease;
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn:focus{outline:3px solid rgba(31,159,235,0.14);outline-offset:3px}
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            background-color: var(--text-main);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: transform 0.2s, background-color 0.2s;
+        }
 
-    .foot{margin-top:1.5rem;font-size:14px;color:rgba(230,238,247,0.6)}
+        .btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
 
-    /* Responsive adjustments */
-    @media (hover:hover) and (min-width:720px){
-      .card:hover{transform:translateY(-6px)}
-    }
-  </style>
+        /* Subtile Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
 </head>
 <body>
 
-  <main class="wrap" role="main">
-    <section class="card" aria-labelledby="title">
-      <div class="rim" aria-hidden="true"></div>
-      <div class="sheen" aria-hidden="true"></div>
-      <div class="content">
-        <!-- STATUS CODE: Will be replaced by FastAPI (e.g., 404, 500) -->
-        <div class="code">{{ STATUS_CODE }}</div>
-
-        <!-- Metadata -->
-        <div class="meta">
-          <!-- TITLE: Will be replaced by FastAPI (e.g., Seite nicht gefunden) -->
-          <h1 id="title">{{ TITLE }}</h1>
-          
-          <!-- DESCRIPTION: Will be replaced by FastAPI (e.g., Die angeforderte Seite existiert nicht...) -->
-          <p id="description">{{ DESCRIPTION }}</p>
-          
-          <a class="btn" href="/" role="button">Zur Startseite</a>
-          
-          <div class="foot">Bei anhaltenden Problemen kontaktieren Sie bitte den Support.</div>
-        </div>
-      </div>
-    </section>
-  </main>
+    <div class="container">
+        <div class="error-code">{{ TITLE }}</div>
+        <h1 class="title">Hoppla! Etwas lief schief.</h1>
+        <p class="description">
+            {{ DESCRIPTION }}
+        </p>
+        <a href="/" class="btn">Zurück zur Startseite</a>
+    </div>
 
 </body>
 </html>
