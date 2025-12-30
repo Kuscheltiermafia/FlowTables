@@ -98,7 +98,7 @@ def read_secret_data():
     # This will trigger the custom exception handler above
     raise HTTPException(status_code=403, detail="Kein Zugriff. Nur Administratoren dürfen diesen Bereich sehen.")
 
-@app.get("/trigger-404")
-def trigger_404_programmatically():
+@app.get("/trigger-500")
+def trigger_500_programmatically():
     """Example route that raises a 404 Not Found error."""
-    raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Der angeforderte API-Endpunkt ist nicht vorhanden.")
+    raise HTTPException(status_code=HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")

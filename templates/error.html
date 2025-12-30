@@ -7,9 +7,9 @@
     <style>
         :root {
             --bg-color: #f8f9fa;
-            --text-main: #2d3436;
+            --text-main: #1F3A63;
             --text-secondary: #636e72;
-            --accent: #0984e3;
+            --accent: #00998f;
             --card-bg: #ffffff;
         }
 
@@ -27,25 +27,76 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
+            overflow: hidden;
             text-align: center;
+            position: relative;
+            perspective: 1000px; /* Adds depth for the subtle tilt */
+        }
+
+        /* The Big Background Error Code with Transition for smoothness */
+        .background-code {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* Centering handled via JS and initial transform */
+            transform: translate(-50%, -50%);
+            font-size: 45vw;
+            font-weight: 900;
+            z-index: -1;
+            user-select: none;
+            pointer-events: none;
+            opacity: 0.8;
+            line-height: 1;
+            background: linear-gradient(180deg, #1f9feb, #00c0b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Transition makes the movement feel "heavy" and smooth */
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+
+        .big-container {
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
         .container {
-            padding: 2rem;
-            max-width: 500px;
+            padding: 3rem;
+            max-width: 550px;
             width: 90%;
+            z-index: 1;
+            animation: fadeIn 0.6s ease-out;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.58);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            /* background: rgba(255, 255, 255, 0.8); */
         }
 
         .error-code {
-            font-size: 8rem;
+            font-size: 5rem;
             font-weight: 900;
             line-height: 1;
             margin-bottom: 1rem;
-            letter-spacing: -5px;
-            background: linear-gradient(135deg, #1f9feb 57%, #00c0b3 25%);
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #1f9feb, #00c0b3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            opacity: 0.8;
         }
 
         .title {
@@ -67,38 +118,56 @@
             text-decoration: none;
             background-color: var(--text-main);
             color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: transform 0.2s, background-color 0.2s;
+            padding: 0.8rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
         .btn:hover {
             background-color: var(--accent);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 153, 143, 0.3);
         }
 
-        /* Subtile Animation */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        .container {
-            animation: fadeIn 0.6s ease-out;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="error-code">{{ TITLE }}</div>
-        <h1 class="title">Hoppla! Etwas lief schief.</h1>
-        <p class="description">
-            {{ DESCRIPTION }}
-        </p>
-        <a href="/" class="btn">Zurück zur Startseite</a>
+    <div class="background-code" id="bgCode">{{ TITLE }}</div>
+
+    <div class="big-container">
+        <div class="container">
+            <div class="error-code">{{ TITLE }}</div>
+            <h1 class="title">Hoppla! Etwas lief schief.</h1>
+            <p class="description">
+                {{ DESCRIPTION }}
+            </p>
+            <a href="/" class="btn">Zurück zur Startseite</a>
+        </div>
     </div>
 
+    <script>
+        const bgCode = document.getElementById('bgCode');
+        
+        document.addEventListener('mousemove', (e) => {
+            // Calculate mouse position as a percentage of the screen
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+            
+            // Move the background code slightly in the opposite direction
+            // and apply a subtle shadow shift
+            bgCode.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotateX(${y/8}deg) rotateY(${-x/8}deg)`;
+            
+            // Dynamic shadow that moves with the "light source" (the mouse)
+            const shadowX = x * -0.5;
+            const shadowY = y * -0.5;
+            bgCode.style.filter = `drop-shadow(${shadowX}px ${shadowY}px 30px rgba(0,0,0,0.3))`;
+        });
+    </script>
 </body>
 </html>
