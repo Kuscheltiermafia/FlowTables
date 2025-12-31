@@ -2,7 +2,7 @@
 import pytest
 from httpx import AsyncClient
 from fastapi import status
-from main import app # Import your FastAPI app
+from Main import app # Import your FastAPI app
 
 # Mark all tests in this file as async-capable
 pytestmark = pytest.mark.asyncio
@@ -22,7 +22,7 @@ async def test_create_user_success(async_client: AsyncClient):
         "email": "test@example.com",
         "password": "aSecurePassword123"
     }
-    response = await async_client.post("/api/v1/users", json=user_data)
+    response = await async_client.post("/api/users/create_user", json=user_data)
     
     assert response.status_code == status.HTTP_201_CREATED
     
@@ -41,9 +41,9 @@ async def test_create_user_conflict(async_client: AsyncClient):
         "email": "conflict@example.com",
         "password": "aSecurePassword123"
     }
-    response1 = await async_client.post("/api/v1/users", json=user_data)
+    response1 = await async_client.post("/api/users/create_user", json=user_data)
     assert response1.status_code == status.HTTP_201_CREATED
 
     # Then, try to create the same user again
-    response2 = await async_client.post("/api/v1/users", json=user_data)
+    response2 = await async_client.post("/api/users/create_user", json=user_data)
     assert response2.status_code == status.HTTP_409_CONFLICT
