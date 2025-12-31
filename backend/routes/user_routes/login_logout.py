@@ -39,7 +39,7 @@ async def user_login_post_route(request: Request, username: str = Form(...), pas
         user = await get_user_by_username(conn, username)
         message = f"User Valid | User Id: {user}"
         request.session["logged_in"] = True
-        request.session["user"] = user["userid"]
+        request.session["user"] = user["user_id"]
 
     return '<script>window.location.replace("/dashboard");</script>'
 
