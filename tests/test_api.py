@@ -2,7 +2,7 @@
 import pytest
 from httpx import AsyncClient
 from fastapi import status
-from app.main import app # Import your FastAPI app
+from main import app # Import your FastAPI app
 
 # Mark all tests in this file as async-capable
 pytestmark = pytest.mark.asyncio
