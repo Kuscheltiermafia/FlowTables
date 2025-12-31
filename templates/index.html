@@ -1,53 +1,511 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" 
-      href="{{ url_for('static', path='/styles.css') }}?v={{ cache_buster }}">
-  <link rel="shortcut icon" href="{{ url_for('static', path='/favicon.ico') }}?v={{ cache_buster }}" type="image/x-icon">
-  
-  <title>TeamCards & MultiUser Table</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowTables | Clean Data</title>
+    <link rel="shortcut icon" href="{{ url_for('static', path='/favicon.ico') }}?v={{ cache_buster }}" type="image/x-icon">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --color-primary: #1f9feb;
+            --color-secondary: #00c0b3;
+            --color-accent: #8ce298;
+            --color-background-light: #F8FAFC; 
+            --color-text-dark: #1F3A63; 
+            --color-surface: white; 
+            --color-border: #E2E8F0;
+            --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--color-background-light);
+            color: var(--color-text-dark);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Dynamic Text Animation Styles --- */
+        .word-wrapper {
+            display: inline-block;
+            vertical-align: top;
+            height: 1.2em;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dynamic-word {
+            display: block;
+            color: var(--color-primary);
+            font-weight: 800;
+            transform-origin: top left;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
+        }
+
+        .dynamic-word.hidden-up {
+            transform: translateY(-120%) rotateX(45deg);
+            opacity: 0;
+            filter: blur(5px);
+        }
+
+        .dynamic-word.visible {
+            transform: translateY(0) rotateX(0deg);
+            opacity: 1;
+            filter: blur(0px);
+        }
+
+        .dynamic-word.hidden-down {
+            transform: translateY(120%) rotateX(-45deg);
+            opacity: 0;
+            filter: blur(5px);
+        }
+
+        /* --- Navigation --- */
+        nav {
+            padding: 1.2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid transparent;
+            transition: var(--easing);
+        }
+
+        nav.scrolled {
+            border-bottom: 1px solid var(--color-border);
+            padding: 0.8rem 5%;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 700; font-size: 1.2rem;
+            color: var(--color-text-dark);
+            cursor: pointer;
+        }
+
+        .logo img { width: 28px; height: 28px; transition: transform 0.6s var(--easing); }
+        .logo:hover img { transform: rotate(180deg) scale(1.1); }
+
+        /* --- Hero --- */
+        .hero {
+            min-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 100px 5% 50px;
+            perspective: 1000px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: #64748b;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        /* --- 3D Grid Visual --- */
+        .grid-visual {
+            width: 90%; max-width: 1000px; margin: 0 auto;
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.05);
+            transform: rotateX(10deg);
+            transition: transform 0.1s linear;
+        }
+
+        .table-row {
+            display: grid; grid-template-columns: 40px 2fr 1fr 1fr;
+            padding: 18px;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            transition: 0.3s var(--easing);
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .table-row:last-child { border: none; }
+        .table-row:hover { 
+            background: #f8fafc; 
+            transform: scale(1.02) translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border); transition: 0.4s; }
+        .table-row:hover .dot { background: var(--color-secondary); transform: scale(1.4); }
+
+        /* --- Buttons --- */
+        .btn-main {
+            padding: 14px 32px; background: var(--color-text-dark); color: white;
+            border-radius: 12px; text-decoration: none; font-weight: 600;
+            position: relative; overflow: hidden; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: inline-block;
+        }
+
+        .btn-login {
+            padding: 14px 32px;
+            background: var(--color-text-dark, #222); 
+            color: white;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            z-index: 1;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+        }
+
+        .btn-login::before,
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            width: 150%; 
+            height: 150%;
+            top: 100%; 
+            left: -25%; 
+            border-radius: 45%; 
+            animation: wave-spin 6s linear infinite;
+            transition: top 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .btn-login::before { background-color: rgba(31, 159, 235, 0.4); animation-duration: 10s; }
+        .btn-login::after { background-color: #1f9feb; animation-duration: 6s; }
+        .btn-login:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(31, 159, 235, 0.3); }
+        .btn-login:hover::before { top: -40%; }
+        .btn-login:hover::after { top: -50%; }
+
+        @keyframes wave-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-main:hover {
+            transform: scale(1.08) rotate(0deg) translate(0px, -12px) skewX(0deg);
+            box-shadow: 0 25px 30px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+            background-color: var(--color-primary);
+        }
+
+        /* --- Features --- */
+        .features {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px; padding: 100px 10%;
+        }
+
+        .card {
+            padding: 40px; background: transparent;
+            border: 1px solid transparent; border-radius: 20px;
+            transition: all 0.5s var(--easing);
+        }
+
+        .card:hover {
+            background: white; border-color: var(--color-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            width: 45px; height: 45px; background: #edf2f7; border-radius: 12px;
+            margin-bottom: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; transition: 0.4s;
+        }
+        
+        .card:hover .card-icon { background: var(--color-primary); color: white; transform: rotate(360deg); }
+
+        /* --- Blob Animation --- */
+        .floating-element {
+            position: absolute; z-index: -1; filter: blur(90px); border-radius: 50%; opacity: 0.35;
+            animation: floatBlob 10s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 40px) scale(1.1); }
+        }
+
+        /* --- NEW: CUSTOM MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--color-border);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--color-text-dark);
+        }
+
+        .modal-message {
+            color: #64748b;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: var(--color-text-dark);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+            background: var(--color-primary);
+        }
+
+        footer { padding: 80px 0; text-align: center; border-top: 1px solid var(--color-border); color: #94a3b8; font-size: 0.9rem; }
+    </style>
 </head>
 <body>
 
-  <h1>TeamCards & MultiUser Table</h1>
+    <div class="floating-element" style="width: 450px; height: 450px; background: var(--color-primary); top: -150px; right: -150px;"></div>
+    <div class="floating-element" style="width: 350px; height: 350px; background: var(--color-secondary); bottom: 10%; left: -100px; animation-delay: -5s;"></div>
 
-  <h2>TeamCards</h2>
-  <p>This section will show team member cards.</p>
+    <nav id="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', path='/favicon.ico') }}?v={{ cache_buster }}" alt="Logo">
+            <span>flowTables</span>
+        </div>
+        <div style="display: flex; gap: 30px; align-items: center;">
+            <a href="/login" class="btn-login" id="btn-login1" style="padding: 10px 20px; font-size: 0.9rem;">Login</a>
+        </div>
+    </nav>
 
-  <h2>MultiUser Table Program</h2>
-  <p>This section will handle the multi-user functionality.</p>
+    <section class="hero" id="hero-section">
+        <h1 class="animate__animated animate__fadeInUp">
+            Organize data.<br>
+            <span class="word-wrapper">
+                <span id="word-cycler" class="dynamic-word visible">Effortlessly.</span>
+            </span>
+        </h1>
+        <p class="animate__animated animate__fadeInUp animate__delay-1s">
+            A high-performance workspace for teams who need real-time tables, offline sync, and zero friction.
+        </p>
+        
+        <div style="margin-bottom: 60px;" class="animate__animated animate__zoomIn animate__delay-1s">
+            <a href="#" class="btn-main">Launch Project</a>
+        </div>
 
-  <form action="/api/users/create_user" method="post" id="user-form">
-    <input type="text" name="userName" placeholder="userName"> <br> <br>
-    <input type="text" name="firstName" placeholder="firstName"> <br> <br>
-    <input type="text" name="lastName" placeholder="lastName"> <br> <br>
-    <input type="email" name="email" placeholder="email"> <br> <br>
-    <input type="password" name="password" placeholder="password"> <br> <br>
-    <input class="btn" type="submit">
-  </form>
+        <div class="grid-visual animate__animated animate__fadeInUp animate__delay-1s" id="tilt-grid">
+            <div class="table-row">
+                <div class="dot"></div>
+                <div style="font-weight: 600;">Team Strategy 2026</div>
+                <div style="color: #64748b;">Updated 2m ago</div>
+                <div style="text-align: right;"><span style="color: var(--color-secondary); font-weight: 600;">● Online</span></div>
+            </div>
+            <div class="table-row">
+                <div class="dot"></div>
+                <div style="font-weight: 600;">Product Roadmap</div>
+                <div style="color: #64748b;">Updated 15m ago</div>
+                <div style="text-align: right;"><span style="color: var(--color-primary); font-weight: 600;">● Syncing</span></div>
+            </div>
+            <div class="table-row">
+                <div class="dot"></div>
+                <div style="font-weight: 600;">Inventory Log</div>
+                <div style="color: #64748b;">Updated 1h ago</div>
+                <div style="text-align: right;"><span style="color: #cbd5e1;">● Offline</span></div>
+            </div>
+        </div>
+    </section>
 
+    <section class="features">
+        <div class="card" data-aos="fade-up">
+            <div class="card-icon">⚡</div>
+            <h3>Real-time Sync</h3>
+            <p>Every keystroke is saved and broadcasted to your team instantly. No more refreshing.</p>
+        </div>
+        <div class="card" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-icon">📡</div>
+            <h3>Bluetooth Mesh</h3>
+            <p>Collaborate in the basement or in flight. Long-range Bluetooth keeps the flow going without WiFi.</p>
+        </div>
+        <div class="card" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-icon">🔗</div>
+            <h3>Relational Tables</h3>
+            <p>Connect rows between projects. Build complex databases with the simplicity of a spreadsheet.</p>
+        </div>
+    </section>
 
+    <footer>
+        <p>Designed for the future of work. &copy; 2025 FlowTables.</p>
+    </footer>
+
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">Success</div>
+            <div id="modal-message" class="modal-message">Operation completed successfully.</div>
+            <button class="modal-btn" onclick="closeModal()">Got it</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // --- Initialize Animations ---
+        AOS.init({ duration: 800, easing: 'ease-out-back', once: true });
+
+        // --- Modal Functions ---
+        function showModal(message, title = "Success") {
+            const modal = document.getElementById('custom-modal');
+            if (modal) {
+                document.getElementById('modal-message').innerText = message;
+                // Note: I added a check for modal-title to be safe
+                const titleEl = document.querySelector('.modal-title');
+                if(titleEl) titleEl.innerText = title;
+                
+                modal.classList.add('active');
+            } else {
+                alert(message);
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // Close modal when clicking the dark background overlay
+        const modalOverlay = document.getElementById('custom-modal');
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+        }
+        
+        // NEW: Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                closeModal();
+            }
+        });
+
+        // --- Server-Side Variable Injection ---
+        // Ensure these variables are passed by your backend (Flask/FastAPI/Django)
+        const logged_in = {{ logg_status }}; 
+        const message = "{{ message }}";
+        
+        if (logged_in) {
+            const buttonthinglogin = document.getElementById("btn-login1");
+            buttonthinglogin.innerText = "Dashboard";
+            buttonthinglogin.href = "/dashboard"; 
+        }
+
+        if (message && message !== "null" && message !== "") {
+            // Check specifically for logged_out, otherwise show generic message
+            if (message === "logged_out") {
+                showModal("You have successfully logged out.", "See you soon!");
+            }
+        }
+
+        // --- 1. Navbar Scroll Effect ---
+        window.onscroll = function() {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        };
+
+        // --- 2. Dynamic Text Cycler Animation ---
+        const words = ["Effortlessly.", "Securely.", "Fast.", "Together."];
+        let currentWordIndex = 0;
+        const textElement = document.getElementById('word-cycler');
+
+        setInterval(() => {
+            textElement.classList.remove('visible');
+            textElement.classList.add('hidden-up');
+
+            setTimeout(() => {
+                currentWordIndex = (currentWordIndex + 1) % words.length;
+                textElement.innerText = words[currentWordIndex];
+                
+                textElement.style.transition = 'none';
+                textElement.classList.remove('hidden-up');
+                textElement.classList.add('hidden-down');
+
+                void textElement.offsetWidth; // Force Reflow
+
+                textElement.style.transition = 'transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease';
+                textElement.classList.remove('hidden-down');
+                textElement.classList.add('visible');
+            }, 600); 
+        }, 5000);
+
+        // --- 3. Mouse Parallax Tilt for Table Grid ---
+        const heroSection = document.getElementById('hero-section');
+        const tiltGrid = document.getElementById('tilt-grid');
+
+        heroSection.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 40; 
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+            
+            const clampedX = Math.max(-10, Math.min(10, xAxis));
+            const clampedY = Math.max(-10, Math.min(10, yAxis));
+
+            tiltGrid.style.transform = `rotateY(${clampedX}deg) rotateX(${clampedY}deg)`;
+        });
+
+        heroSection.addEventListener('mouseleave', () => {
+            tiltGrid.style.transform = `rotateY(0deg) rotateX(10deg)`;
+        });
+    </script>
 </body>
-<script>
-// const button = document.getElementById('post-btn');
-
-// button.addEventListener('click', async () => {
-//   try {
-//     const response = await fetch('api/users/create_user', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json'
-//       },
-//       body: JSON.stringify({ name: 'lolo' })
-//     });
-
-//     const data = await response.json();
-//     console.log('Completed!', data);
-//   } catch (err) {
-//     console.error(`Error: ${err}`);
-//   }
-// });
-
-</script>
 </html>

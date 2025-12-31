@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowTables Skeleton</title>
+    <style>
+        /* 1. FLOWTABLES STYLE GUIDE - VARIABLES */
+        :root {
+            --color-primary: #1f9feb;
+            --color-secondary: #00c0b3;
+            --color-accent: #8ce298;
+            --color-background-light: #F8FAFC;
+            --color-text-dark: #1F3A63;
+            --color-surface: white;
+            --color-border: #E2E8F0;
+            
+            --easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* 2. RESET & LAYOUT */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--color-background-light);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 3. TYPOGRAPHY (Only for the one text) */
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--color-text-dark);
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 4. SKELETON UTILITIES (Shapes) */
+        .skeleton {
+            background-color: var(--color-border);
+            border-radius: 6px;
+            display: inline-block;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Specific Shape Sizes */
+        .sk-text { height: 1em; width: 100%; margin-bottom: 0.5em; display: block; }
+        .sk-subtitle { height: 1.2rem; width: 40%; }
+        .sk-h3 { height: 1.5rem; width: 25%; margin-bottom: 1.5rem; }
+        .sk-circle { width: 40px; height: 40px; border-radius: 50%; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .6; }
+        }
+
+        /* 5. COMPONENTS */
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            flex-shrink: 0;
+            gap: 2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            padding: 3rem;
+            overflow-y: auto;
+        }
+
+        /* Header Area */
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            margin-top: 1rem;
+        }
+
+        /* Button Shape (.btn-main) */
+        .btn-shape {
+            width: 150px;
+            height: 52px;
+            background-color: var(--color-text-dark);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s var(--easing);
+        }
+        .btn-shape:hover {
+            background-color: var(--color-primary);
+            transform: scale(1.08) translateY(-12px);
+            box-shadow: 0 25px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.4s var(--easing);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            transform: translateY(-5px);
+        }
+
+        /* Table Shapes */
+        .table-shape-container {
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .table-row {
+            display: grid;
+            grid-template-columns: 0.5fr 2fr 1fr 1fr 1fr;
+            background-color: var(--color-surface);
+            padding: 1.2rem;
+            gap: 1rem;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .table-header { background-color: #F1F5F9; }
+        .table-row:last-child { border-bottom: none; }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+            <div class="skeleton sk-circle" style="background-color: var(--color-primary);"></div>
+            <div class="skeleton" style="height: 24px; width: 120px;"></div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="skeleton" style="height: 40px; width: 100%; opacity: 0.8; border-radius: 8px;"></div>
+            <div class="skeleton" style="height: 20px; width: 80%;"></div>
+            <div class="skeleton" style="height: 20px; width: 85%;"></div>
+            <div class="skeleton" style="height: 20px; width: 60%;"></div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <div class="header-area">
+            <div style="width: 70%;">
+                <h1>Hallo {{ firstname }}!</h1>
+                
+                <div class="skeleton sk-subtitle" style="margin-top: 10px;"></div>
+            </div>
+            <div class="btn-shape"></div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="card">
+                <div class="skeleton" style="height: 12px; width: 30%; background-color: var(--color-secondary);"></div>
+                <div class="skeleton" style="height: 35px; width: 60%;"></div>
+                <div class="skeleton" style="height: 12px; width: 80%;"></div>
+            </div>
+            <div class="card">
+                <div class="skeleton" style="height: 12px; width: 30%; background-color: var(--color-secondary);"></div>
+                <div class="skeleton" style="height: 35px; width: 45%;"></div>
+                <div class="skeleton" style="height: 12px; width: 50%;"></div>
+            </div>
+            <div class="card">
+                <div class="skeleton" style="height: 12px; width: 30%; background-color: var(--color-secondary);"></div>
+                <div class="skeleton" style="height: 35px; width: 75%;"></div>
+                <div class="skeleton" style="height: 12px; width: 60%;"></div>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 0; border: none; background: transparent; box-shadow: none;">
+            <div style="padding-bottom: 20px;">
+                <div class="skeleton sk-h3"></div>
+                <div class="skeleton sk-text" style="width: 300px;"></div>
+            </div>
+
+            <div class="table-shape-container">
+                <div class="table-row table-header">
+                    <div class="skeleton" style="height: 12px;"></div>
+                    <div class="skeleton" style="height: 12px;"></div>
+                    <div class="skeleton" style="height: 12px;"></div>
+                    <div class="skeleton" style="height: 12px;"></div>
+                    <div class="skeleton" style="height: 12px;"></div>
+                </div>
+                <div class="table-row">
+                    <div class="skeleton" style="height: 12px; width: 70%;"></div>
+                    <div class="skeleton" style="height: 18px; width: 80%;"></div>
+                    <div class="skeleton" style="height: 12px; width: 50%;"></div>
+                    <div class="skeleton" style="height: 12px; width: 60%;"></div>
+                    <div class="skeleton" style="height: 24px; width: 80px; border-radius: 20px; background-color: #e0f2fe;"></div>
+                </div>
+                <div class="table-row">
+                    <div class="skeleton" style="height: 12px; width: 70%;"></div>
+                    <div class="skeleton" style="height: 18px; width: 60%;"></div>
+                    <div class="skeleton" style="height: 12px; width: 50%;"></div>
+                    <div class="skeleton" style="height: 12px; width: 60%;"></div>
+                    <div class="skeleton" style="height: 24px; width: 80px; border-radius: 20px; background-color: #ccfbf1;"></div>
+                </div>
+                <div class="table-row">
+                    <div class="skeleton" style="height: 12px; width: 70%;"></div>
+                    <div class="skeleton" style="height: 18px; width: 90%;"></div>
+                    <div class="skeleton" style="height: 12px; width: 50%;"></div>
+                    <div class="skeleton" style="height: 12px; width: 60%;"></div>
+                    <div class="skeleton" style="height: 24px; width: 80px; border-radius: 20px; background-color: #e0f2fe;"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>
