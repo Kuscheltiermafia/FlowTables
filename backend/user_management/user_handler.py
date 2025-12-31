@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 
 import bcrypt
@@ -24,9 +25,11 @@ async def create_user(user_connection:Connection,  userName: str, email: str, pa
 
     hashed_pw = hash_password(password)
 
-    user_id = await user_connection.fetchval(
-        'INSERT INTO users (userName, email, password, lastName, firstName) VALUES ($1, $2, $3, $4, $5) RETURNING users.user_id',
-        userName, email, hashed_pw, lastName, firstName
+    user_id = uuid.uuid4()
+
+    await user_connection.execute(
+        'INSERT INTO users (user_id, userName, email, password, lastName, firstName) VALUES ($1, $2, $3, $4, $5, $6)',
+        user_id, userName, email, hashed_pw, lastName, firstName
     )
     return user_id
 
