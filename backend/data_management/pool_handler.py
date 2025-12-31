@@ -33,3 +33,9 @@ async def close_data_pool():
     if data_pool is not None:
         await data_pool.close()
         data_pool = None
+
+        print("Data database pool closed.")
+
+async def get_data_pool():
+    with data_pool.acquire() as conn:
+        yield conn

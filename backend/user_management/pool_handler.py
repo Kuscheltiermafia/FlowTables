@@ -34,6 +34,8 @@ async def close_user_pool():
         await user_pool.close()
         user_pool = None
 
+        print("User database pool closed.")
+
 async def get_user_pool():
     async with user_pool.acquire() as conn:
         yield conn

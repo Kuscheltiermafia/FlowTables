@@ -56,10 +56,10 @@ async def setup_databases():
 
     #Create 'users' table
     await conn.execute('''CREATE TABLE IF NOT EXISTS users (
-        user_id    SERIAL NOT NULL PRIMARY KEY,
-        username  VARCHAR(25) NOT NULL UNIQUE,
-        email     VARCHAR(50) NOT NULL,
-        password  VARCHAR(100) NOT NULL UNIQUE,
+        user_id UUID NOT NULL PRIMARY KEY,
+        username VARCHAR(25) NOT NULL UNIQUE,
+        email VARCHAR(50) NOT NULL,
+        password VARCHAR(100) NOT NULL,
         lastname VARCHAR(50),
         firstname VARCHAR(50)
         )''')
@@ -67,17 +67,17 @@ async def setup_databases():
 
     #Create 'teams' table
     await conn.execute('''CREATE TABLE IF NOT EXISTS teams (
-        team_id SERIAL PRIMARY KEY,
+        team_id UUID PRIMARY KEY,
         team_name VARCHAR(50) NOT NULL UNIQUE
         )''')
     print("Created 'teams' table in 'users' database")
 
-    # Creating 'team_role'
+    # Creating 'team_role' enum type
     await conn.execute('''
                     DO $$
                     BEGIN
                         IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'team_role') THEN
-                            CREATE TYPE team_role AS ENUM ('member', 'moderator', 'admin', 'owner');
+                            CREATE TYPE team_role AS ENUM ('member', 'moderator', 'admin');
                         END IF;
                     END$$;
                 ''')
@@ -86,8 +86,8 @@ async def setup_databases():
     # Create 'team_members' table
     #Etvl. Perms weiter ausarbeiten / ändern
     await conn.execute('''CREATE TABLE IF NOT EXISTS team_members(
-        user_id INT REFERENCES users ("user_id") ON DELETE CASCADE,
-        team_id INT REFERENCES teams ("team_id") ON DELETE CASCADE,
+        user_id UUID REFERENCES users ("user_id") ON DELETE CASCADE,
+        team_id UUID REFERENCES teams ("team_id") ON DELETE CASCADE,
         role team_role NOT NULL DEFAULT 'member',
         PRIMARY KEY (user_id, team_id)
         )''')
@@ -95,27 +95,55 @@ async def setup_databases():
 
     #Create 'projects' table
     await conn.execute('''CREATE TABLE IF NOT EXISTS projects (
-        project_id VARCHAR(36) PRIMARY KEY,
+        project_id UUID PRIMARY KEY,
         project_name VARCHAR(50) NOT NULL,
-        owner_id INT REFERENCES users ("user_id") ON DELETE SET NULL
+        owner_id UUID REFERENCES users ("user_id") ON DELETE SET NULL
         )''')
     print("Created 'projects' table in 'users' database")
 
+    # Creating 'project_role' enum type
+    await conn.execute('''
+                        DO $$
+                        BEGIN
+                            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'project_role') THEN
+                                CREATE TYPE project_role AS ENUM ('viewer', 'editor', 'moderator', 'admin', 'owner');
+                            END IF;
+                        END$$;
+                    ''')
+    print("Created 'project_role' enum type in 'users' database")
+
     #Create 'project_members' table
     await conn.execute('''CREATE TABLE IF NOT EXISTS project_members (
-        user_id INT REFERENCES users ("user_id") ON DELETE CASCADE,
-        project_id VARCHAR(36) REFERENCES projects ("project_id") ON DELETE CASCADE,
-        permission json
+        user_id UUID REFERENCES users ("user_id") ON DELETE CASCADE,
+        project_id UUID REFERENCES projects ("project_id") ON DELETE CASCADE,
+        role project_role NOT NULL DEFAULT 'viewer',
+        PRIMARY KEY (user_id, project_id)
         )''')
     print("Created 'project_members' table in 'users' database")
 
     #Create 'project_teams' table
     await conn.execute('''CREATE TABLE IF NOT EXISTS project_teams (
         team_id INT REFERENCES teams ("team_id") ON DELETE CASCADE,
-        project_id VARCHAR(36) REFERENCES projects ("project_id") ON DELETE CASCADE,
-        permission json
+        project_id UUID REFERENCES projects ("project_id") ON DELETE CASCADE,
+        role project_role NOT NULL DEFAULT 'viewer',
+        PRIMARY KEY (team_id, project_id)
         )''')
     print("Created 'project_teams' table in 'users' database")
+
+    #CCreate 'permissions' schema
+    await conn.execute('''CREATE SCHEMA IF NOT EXISTS permissions''')
+    print("Created 'permissions' schema in 'users' database")
+
+    # Creating 'table_permission' enum type
+    await conn.execute('''
+                        DO $$
+                        BEGIN
+                            IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'table_permission') THEN
+                                CREATE TYPE table_permission AS ENUM ('none', 'read', 'write');
+                            END IF;
+                        END$$;
+                    ''')
+    print("Created 'table_permission' enum type in 'users' database")
 
     #Close the connection to the 'users' database
     await conn.close()

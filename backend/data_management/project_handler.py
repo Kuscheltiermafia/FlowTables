@@ -7,11 +7,24 @@ from pydantic import Json
 
 
 async def create_project(user_connection:Connection, data_connection:Connection, project_name: str, owner_id: int):
-    project_id = str(uuid.uuid4())
+    project_id = uuid.uuid4()
 
     await data_connection.execute(f'CREATE SCHEMA "{project_id}"')
     await user_connection.execute('INSERT INTO projects (project_id, project_name, owner_id) VALUES ($1, $2, $3)', project_id, project_name, owner_id)
     await user_connection.execute('INSERT INTO project_members (project_id, user_id, permission) VALUES ($1, $2, $3::json)', project_id, owner_id, json.dumps({"temp": "owner"}))
+
+    await user_connection.execute(f'''CREATE TABLE IF NOT EXISTS permissions."{project_id}" (
+        table_id UUID,
+        user_id UUID REFERENCES users ("user_id") ON DELETE CASCADE,
+        start_row INT NOT NULL,
+        end_row INT NOT NULL,
+        start_col INT NOT NULL,
+        end_col INT NOT NULL,
+        permission table_permission NOT NULL DEFAULT 'none',
+        PRIMARY KEY (table_id, user_id, start_row, end_row, start_col, end_col),
+        CONSTRAINT valid_row_range CHECK (end_row >= start_row),
+        CONSTRAINT valid_col_range CHECK (end_col >= start_col)
+    )''')
 
     return str(project_id)
 
@@ -26,6 +39,7 @@ async def get_project_name(user_connection:Connection, project_id: str) -> str |
 
 async def delete_project(user_connection:Connection, data_connection:Connection, project_id: str):
     await data_connection.execute(f'DROP SCHEMA IF EXISTS "{project_id}" CASCADE')
+    await data_connection.execute(f'DROP SCHEMA IF EXISTS permissions."{project_id}" CASCADE')
     await user_connection.execute('DELETE FROM projects WHERE project_id = $1', project_id)
     await user_connection.execute('DELETE FROM project_members WHERE project_id = $1', project_id)
     await user_connection.execute('DELETE FROM project_teams WHERE project_id = $1', project_id)
