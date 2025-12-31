@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from dotenv import load_dotenv
 from fastapi.responses import FileResponse
 import os
 from backend.routes import api
@@ -46,10 +47,14 @@ ERROR_DETAILS = {
 app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Router
 app.include_router(api.api_router)
 app.include_router(user.user_router)
-app.add_middleware(SessionMiddleware, secret_key="SecretKey")
 
+load_dotenv('.env.deployment')
+SECRET_KEY = os.getenv("SECRET_KEY")
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 templates = Jinja2Templates(directory="templates")
 
 @app.exception_handler(StarletteHTTPException)

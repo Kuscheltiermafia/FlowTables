@@ -12,3 +12,10 @@ Features may include but are not limited to:
 - Connection between tables
 
 This will be available as App and as Website for easy access.
+
+## How to run
+
+Clone this repository
+
+Run
+´´´ python -m uvicorn Main:app --host 0.0.0.0 --port 8000 --reload ´´´

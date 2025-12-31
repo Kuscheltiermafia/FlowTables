@@ -26,6 +26,6 @@ async def api_users_create_user_post(
     conn: Connection = Depends(get_user_pool)
 ):
     user = User(userName, firstName, lastName, email, password)
-    usr_id = await create_user(conn ,userName, firstName, lastName, email, password)
+    usr_id = await create_user(conn ,userName=userName, firstName=firstName, lastName=lastName, email=email, password=password)
     print(usr_id)
     return {"created_user": user.__dict__}

@@ -23,16 +23,21 @@ async def user_login_get_route(request: Request):
         {"request": request, "cache_buster": int(time.time())} 
     )
     
-@router.post("/login")
-async def user_login_post_route(request: Request, username: str, password: str, conn: Connection = Depends(get_user_pool)):
-    user_id = None
-    user_valid = valid_password(user_connection=conn, userKey=username, password=password)
-    if user_valid:
-        user_id = get_user_by_username(username)
-        request.session["logged_in"] = True
-        request.session["user"] = user_id
+@router.post("/login", response_class=HTMLResponse)
+async def user_login_post_route(request: Request, username: str = Form(...), password: str = Form(...), conn: Connection = Depends(get_user_pool)):
+    message = "Not Valid"
+    user_valid = await valid_password(user_connection=conn, userKey=username, password=password)
+    message = f"{user_valid} | username: {username} | password: {password}"
 
-    return {"id": user_id}
+
+    if user_valid:
+        message = "Valid User"
+        user = await get_user_by_username(conn, username)
+        message = f"User Valid | User Id: {user}"
+        request.session["logged_in"] = True
+        request.session["user"] = user["userid"]
+
+    return '<script>window.location.replace("/dashboard");</script>'
 
 @router.post("/logout")
 async def user_logout_post_route(request: Request):
@@ -43,4 +48,4 @@ async def user_logout_post_route(request: Request):
 @router.get("/logout", response_class=HTMLResponse)
 async def user_logout_get_route(request: Request):
     request.session.clear()
-    return 'window.location("/?message=logged_out");'
+    return '<script>window.location.replace("/?message=logged_out");</script>'
