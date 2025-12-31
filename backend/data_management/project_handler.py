@@ -49,19 +49,19 @@ async def project_exists(user_connection:Connection, project_id: UUID) -> bool:
     result = await user_connection.fetchrow('SELECT 1 FROM projects WHERE project_id = $1', project_id)
     return result is not None
 
-async def add_member(user_connection:Connection, project_id: UUID, user_id: UUID, permission: str):
-    await user_connection.execute('INSERT INTO project_members (project_id, user_id, permission) VALUES ($1, $2, $3)', project_id, user_id, permission)
+async def add_member(user_connection:Connection, project_id: UUID, user_id: UUID, role: str):
+    await user_connection.execute('INSERT INTO project_members (project_id, user_id, role) VALUES ($1, $2, $3)', project_id, user_id, role)
 
 async def remove_member(user_connection:Connection, project_id: UUID, user_id: UUID):
     await user_connection.execute('DELETE FROM project_members WHERE project_id = $1 AND user_id = $2', project_id, user_id)
 
 async def list_project_members(user_connection:Connection, project_id: UUID):
-    results = await user_connection.fetch('SELECT user_id, permission FROM project_members WHERE project_id = $1', project_id)
-    return [{'user_id': record['user_id'], 'permission': record['permission']} for record in results]
+    results = await user_connection.fetch('SELECT user_id, role FROM project_members WHERE project_id = $1', project_id)
+    return [{'user_id': record['user_id'], 'role': record['role']} for record in results]
 
-async def change_member_role(user_connection:Connection, project_id: UUID, user_id: UUID, new_permission: str):
-    await user_connection.execute('UPDATE project_members SET permission = $1 WHERE project_id = $2 AND user_id = $3', json.dumps(new_permission), project_id, user_id)
+async def change_member_role(user_connection:Connection, project_id: UUID, user_id: UUID, new_role: str):
+    await user_connection.execute('UPDATE project_members SET role = $1 WHERE project_id = $2 AND user_id = $3', new_role, project_id, user_id)
 
 async def list_user_projects(user_connection:Connection, user_id: UUID):
-    results = await user_connection.fetch('SELECT project_id, project_name, permission FROM projects JOIN project_members USING (project_id) WHERE user_id = $1', user_id)
-    return [{'project_id': record['project_id'], 'project_name': record['project_name'], 'permission': record['permission']} for record in results]
+    results = await user_connection.fetch('SELECT project_id, project_name, role FROM projects JOIN project_members USING (project_id) WHERE user_id = $1', user_id)
+    return [{'project_id': record['project_id'], 'project_name': record['project_name'], 'role': record['role']} for record in results]
