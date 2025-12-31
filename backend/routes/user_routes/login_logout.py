@@ -18,6 +18,10 @@ router = APIRouter(tags=["login_logout"])
 
 @router.get("/login", response_class=HTMLResponse)
 async def user_login_get_route(request: Request):
+    if "logged_in" in request.session and request.session["logged_in"] == True and "user" in request.session:
+        return '<script>window.location.replace("/dashboard");</script>'  
+        
+        
     return templates.TemplateResponse(
         "login.html",
         {"request": request, "cache_buster": int(time.time())} 

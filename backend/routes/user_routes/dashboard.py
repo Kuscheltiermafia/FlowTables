@@ -16,8 +16,14 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(tags=["dashboard"])
 
 @router.get("/dashboard", response_class=HTMLResponse)
-async def user_dashboard_get(request: Request):
+async def user_dashboard_get(request: Request, conn: Connection = Depends(get_user_pool)):
+    if "logged_in" in request.session and request.session["logged_in"] == True and "user" in request.session:
+        user = await get_user_by_id(conn, request.session["user"])
+        firstName = user["firstname"]
+    else:
+        return '<script>window.location.replace("/login");</script>'  
+        
     return templates.TemplateResponse(
         "dashboard.html",
-        {"request": request, "cache_buster": int(time.time())} 
+        {"request": request, "cache_buster": int(time.time()), "firstname": firstName} 
     )
