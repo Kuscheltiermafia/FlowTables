@@ -44,10 +44,10 @@ async def test_setup_project(user_db_transaction, data_db_transaction):
     await add_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, role="editor")
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
     print(members)
-    assert any(member['user_id'] == user2_id and json.loads(member['role']) == "member" for member in members)
+    assert any(member['user_id'] == user2_id and member['role'] == "member" for member in members)
     await change_member_role(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, new_role="moderator")
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
-    assert any(member['user_id'] == user2_id and json.loads(member['role']) == "moderator" for member in members)
+    assert any(member['user_id'] == user2_id and member['role'] == "moderator" for member in members)
 
     await remove_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id)
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
