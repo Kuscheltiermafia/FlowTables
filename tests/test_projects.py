@@ -30,7 +30,7 @@ async def test_setup_project(user_db_transaction, data_db_transaction):
     print(f"Created project with ID: {project_id}")
     db_project_name = await get_project_name(user_connection=user_db_transaction, project_id=project_id)
     assert db_project_name == project_name
-    assert project_exists(user_connection=user_db_transaction, project_id=project_id)
+    assert await project_exists(user_connection=user_db_transaction, project_id=project_id)
 
     user2_id = await create_user(
         user_connection=user_db_transaction,
