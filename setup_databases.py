@@ -123,7 +123,7 @@ async def setup_databases():
 
     #Create 'project_teams' table
     await conn.execute('''CREATE TABLE IF NOT EXISTS project_teams (
-        team_id INT REFERENCES teams ("team_id") ON DELETE CASCADE,
+        team_id UUID REFERENCES teams ("team_id") ON DELETE CASCADE,
         project_id UUID REFERENCES projects ("project_id") ON DELETE CASCADE,
         role project_role NOT NULL DEFAULT 'viewer',
         PRIMARY KEY (team_id, project_id)
