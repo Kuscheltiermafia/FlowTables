@@ -1,6 +1,6 @@
 # Test Organization
 
-This directory contains comprehensive tests for the FlowTables backend.
+This directory contains comprehensive tests for the FlowTables backend and web application.
 
 ## Test Files
 
@@ -23,6 +23,16 @@ This directory contains comprehensive tests for the FlowTables backend.
   - Deleting permissions (all or by range)
 - **test_table_handler.py** - Original comprehensive table tests (will be deprecated)
 
+### Web/UI Tests
+- **test_web_routes.py** - Tests for web application routes and pages
+  - Index/homepage
+  - Login/logout functionality
+  - Dashboard access control
+  - Error pages (403, 404, 500)
+  - Static file serving
+  - Session middleware
+  - Custom headers and middleware
+
 ### API Tests
 - **test_api.py** - API endpoint tests
 
@@ -34,6 +44,7 @@ Tests are organized with pytest markers for selective test execution:
 - `@pytest.mark.data_db` - Tests requiring data database
 - `@pytest.mark.table_operations` - Table and cell operation tests
 - `@pytest.mark.table_permissions` - Permission management tests
+- `@pytest.mark.web` - Web route and UI tests
 
 ## Running Tests
 
@@ -55,6 +66,9 @@ pytest -m table_operations
 
 # Permission tests only
 pytest -m table_permissions
+
+# Web/UI tests only
+pytest -m web
 ```
 
 ### Run specific test files

@@ -99,6 +99,9 @@ async def test_project(user_db_transaction, data_db_transaction, test_user):
 async def test_table(data_db_transaction, test_project):
     """Create a test table in a test project."""
     from backend.data_management.table_handler import create_table
+    from uuid import UUID
     table_name = "test_table"
-    await create_table(data_db_transaction, table_name, str(test_project))
-    return table_name, test_project
+    # Convert to UUID if test_project is a string
+    project_uuid = UUID(test_project) if isinstance(test_project, str) else test_project
+    await create_table(data_db_transaction, table_name, project_uuid)
+    return table_name, project_uuid

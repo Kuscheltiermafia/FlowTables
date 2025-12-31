@@ -32,7 +32,7 @@ async def test_create_table(user_db_transaction, data_db_transaction):
     
     # Create a table
     table_name = "test_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Verify table was created
     result = await data_db_transaction.fetch(
@@ -66,18 +66,18 @@ async def test_create_table_duplicate(user_db_transaction, data_db_transaction):
     
     # Create a table
     table_name = "duplicate_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Try to create the same table again
     with pytest.raises(ValueError, match=f"Table {table_name} already exists in schema"):
-        await create_table(data_db_transaction, table_name, str(project_id))
+        await create_table(data_db_transaction, table_name, project_id)
 
 
 @pytest.mark.data_db
 @pytest.mark.asyncio
 async def test_create_table_nonexistent_schema(data_db_transaction):
     """Test creating a table in non-existent schema raises error."""
-    fake_schema = str(uuid4())
+    fake_schema = uuid4()
     with pytest.raises(ValueError, match=f"Schema {fake_schema} does not exist"):
         await create_table(data_db_transaction, "test_table", fake_schema)
 
@@ -105,7 +105,7 @@ async def test_delete_table(user_db_transaction, data_db_transaction):
     
     # Create a table
     table_name = "delete_test_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Delete the table (using project_id as table_id parameter)
     await delete_table(user_db_transaction, data_db_transaction, table_name, UUID(project_id) if isinstance(project_id, str) else project_id)
@@ -141,13 +141,13 @@ async def test_set_and_get_cell_value(user_db_transaction, data_db_transaction):
     
     # Create a table
     table_name = "cell_test_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Set a cell value
-    await set_cell_value(data_db_transaction, str(project_id), table_name, 1, 1, "Test Value")
+    await set_cell_value(data_db_transaction, project_id, table_name, 1, 1, "Test Value")
     
     # Get the cell value
-    value = await get_cell_value(data_db_transaction, str(project_id), table_name, 1, 1)
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 1, 1)
     assert value == "Test Value"
 
 
@@ -174,16 +174,16 @@ async def test_update_cell_value(user_db_transaction, data_db_transaction):
     
     # Create a table
     table_name = "update_cell_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Set initial value
-    await set_cell_value(data_db_transaction, str(project_id), table_name, 2, 2, "Initial Value")
-    value = await get_cell_value(data_db_transaction, str(project_id), table_name, 2, 2)
+    await set_cell_value(data_db_transaction, project_id, table_name, 2, 2, "Initial Value")
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 2, 2)
     assert value == "Initial Value"
     
     # Update the value
-    await set_cell_value(data_db_transaction, str(project_id), table_name, 2, 2, "Updated Value")
-    value = await get_cell_value(data_db_transaction, str(project_id), table_name, 2, 2)
+    await set_cell_value(data_db_transaction, project_id, table_name, 2, 2, "Updated Value")
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 2, 2)
     assert value == "Updated Value"
 
 
@@ -210,16 +210,16 @@ async def test_delete_cell_value(user_db_transaction, data_db_transaction):
     
     # Create a table
     table_name = "delete_cell_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Set a value
-    await set_cell_value(data_db_transaction, str(project_id), table_name, 3, 3, "Value to Delete")
-    value = await get_cell_value(data_db_transaction, str(project_id), table_name, 3, 3)
+    await set_cell_value(data_db_transaction, project_id, table_name, 3, 3, "Value to Delete")
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 3, 3)
     assert value == "Value to Delete"
     
     # Delete the value by setting empty string
-    await set_cell_value(data_db_transaction, str(project_id), table_name, 3, 3, "")
-    value = await get_cell_value(data_db_transaction, str(project_id), table_name, 3, 3)
+    await set_cell_value(data_db_transaction, project_id, table_name, 3, 3, "")
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 3, 3)
     assert value is None
 
 
@@ -246,10 +246,10 @@ async def test_get_nonexistent_cell_value(user_db_transaction, data_db_transacti
     
     # Create a table
     table_name = "nonexist_cell_table"
-    await create_table(data_db_transaction, table_name, str(project_id))
+    await create_table(data_db_transaction, table_name, project_id)
     
     # Get a non-existent cell
-    value = await get_cell_value(data_db_transaction, str(project_id), table_name, 99, 99)
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 99, 99)
     assert value is None
 
 
