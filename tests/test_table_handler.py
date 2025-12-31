@@ -43,8 +43,8 @@ async def test_create_table(user_db_transaction, data_db_transaction):
     assert result[0]['tablename'] == table_name
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_create_table_duplicate(user_db_transaction, data_db_transaction):
     """Test creating a duplicate table raises error."""
     # Create a test user and project
@@ -73,8 +73,8 @@ async def test_create_table_duplicate(user_db_transaction, data_db_transaction):
         await create_table(data_db_transaction, table_name, str(project_id))
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_create_table_nonexistent_schema(data_db_transaction):
     """Test creating a table in non-existent schema raises error."""
     fake_schema = str(uuid4())
@@ -82,8 +82,8 @@ async def test_create_table_nonexistent_schema(data_db_transaction):
         await create_table(data_db_transaction, "test_table", fake_schema)
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_delete_table(user_db_transaction, data_db_transaction):
     """Test deleting a table."""
     # Create a test user and project
@@ -118,8 +118,8 @@ async def test_delete_table(user_db_transaction, data_db_transaction):
     assert len(result) == 0
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_set_and_get_cell_value(user_db_transaction, data_db_transaction):
     """Test setting and getting cell values."""
     # Create a test user and project
@@ -151,8 +151,8 @@ async def test_set_and_get_cell_value(user_db_transaction, data_db_transaction):
     assert value == "Test Value"
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_update_cell_value(user_db_transaction, data_db_transaction):
     """Test updating an existing cell value."""
     # Create a test user and project
@@ -187,8 +187,8 @@ async def test_update_cell_value(user_db_transaction, data_db_transaction):
     assert value == "Updated Value"
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_delete_cell_value(user_db_transaction, data_db_transaction):
     """Test deleting a cell value by setting it to empty string."""
     # Create a test user and project
@@ -223,8 +223,8 @@ async def test_delete_cell_value(user_db_transaction, data_db_transaction):
     assert value is None
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_get_nonexistent_cell_value(user_db_transaction, data_db_transaction):
     """Test getting a non-existent cell value returns None."""
     # Create a test user and project
@@ -253,8 +253,8 @@ async def test_get_nonexistent_cell_value(user_db_transaction, data_db_transacti
     assert value is None
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_set_permission(user_db_transaction, data_db_transaction):
     """Test setting permissions for a user on a table."""
     # Create test users and project
@@ -300,8 +300,8 @@ async def test_set_permission(user_db_transaction, data_db_transaction):
     assert any(p['permission'] == "read" for p in perms)
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_update_permission(user_db_transaction, data_db_transaction):
     """Test updating an existing permission."""
     # Create test users and project
@@ -345,8 +345,8 @@ async def test_update_permission(user_db_transaction, data_db_transaction):
     assert any(p['permission'] == "write" for p in perms)
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_get_all_user_permissions(user_db_transaction, data_db_transaction):
     """Test getting all permissions for a user."""
     # Create test users and project
@@ -390,8 +390,8 @@ async def test_get_all_user_permissions(user_db_transaction, data_db_transaction
     assert any(p['permission'] == "write" for p in perms)
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_delete_all_user_permissions(user_db_transaction, data_db_transaction):
     """Test deleting all permissions for a user."""
     # Create test users and project
@@ -439,8 +439,8 @@ async def test_delete_all_user_permissions(user_db_transaction, data_db_transact
     assert len(perms) == 0
 
 
-@pytest.mark.asyncio
 @pytest.mark.data_db
+@pytest.mark.asyncio
 async def test_delete_permission_range(user_db_transaction, data_db_transaction):
     """Test deleting a specific permission range."""
     # Create test users and project
