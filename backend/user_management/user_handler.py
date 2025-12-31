@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import bcrypt
 from asyncpg import Connection
 
@@ -11,7 +13,7 @@ def hash_password(password: str) -> str:
 
 # async functions
 
-async def create_user(user_connection:Connection,  userName: str, email: str, password: str, lastName: str, firstName: str) -> int:
+async def create_user(user_connection:Connection,  userName: str, email: str, password: str, lastName: str, firstName: str) -> UUID:
         
     if not all([userName, email, password]):
         raise ValueError("Username, email, and password cannot be empty.")
