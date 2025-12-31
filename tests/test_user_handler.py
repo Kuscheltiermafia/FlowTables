@@ -15,10 +15,12 @@ async def test_hash_and_verify_password():
     hashed = hash_password(plain_password)
     
     # Verify correct password
-    assert verify_password(plain_password, hashed)
+    assert verify_password(plain_password, hashed), \
+        "Password verification should succeed for correct password"
     
     # Verify incorrect password
-    assert not verify_password("WrongPassword", hashed)
+    assert not verify_password("WrongPassword", hashed), \
+        "Password verification should fail for incorrect password"
 
 
 @pytest.mark.user_creation
@@ -36,13 +38,16 @@ async def test_valid_password_with_username(user_db_transaction):
     )
     
     # Test valid password with username
-    assert await valid_password(user_db_transaction, "password_test_user", "SecurePass123!")
+    assert await valid_password(user_db_transaction, "password_test_user", "SecurePass123!"), \
+        "Valid password should authenticate successfully with username"
     
     # Test invalid password
-    assert not await valid_password(user_db_transaction, "password_test_user", "WrongPassword")
+    assert not await valid_password(user_db_transaction, "password_test_user", "WrongPassword"), \
+        "Invalid password should fail authentication"
     
     # Test with non-existent user
-    assert not await valid_password(user_db_transaction, "nonexistent_user", "SecurePass123!")
+    assert not await valid_password(user_db_transaction, "nonexistent_user", "SecurePass123!"), \
+        "Non-existent user should fail authentication"
 
 
 @pytest.mark.user_creation
@@ -60,19 +65,24 @@ async def test_valid_password_with_email(user_db_transaction):
     )
     
     # Test valid password with email
-    assert await valid_password(user_db_transaction, "email@test.com", "SecurePass123!")
+    assert await valid_password(user_db_transaction, "email@test.com", "SecurePass123!"), \
+        "Valid password should authenticate successfully with email"
     
     # Test invalid password
-    assert not await valid_password(user_db_transaction, "email@test.com", "WrongPassword")
+    assert not await valid_password(user_db_transaction, "email@test.com", "WrongPassword"), \
+        "Invalid password should fail authentication with email"
 
 
 @pytest.mark.user_creation
 @pytest.mark.asyncio
 async def test_valid_password_with_none_values(user_db_transaction):
     """Test password validation with None values."""
-    assert not await valid_password(user_db_transaction, None, "password")
-    assert not await valid_password(user_db_transaction, "username", None)
-    assert not await valid_password(user_db_transaction, None, None)
+    assert not await valid_password(user_db_transaction, None, "password"), \
+        "None username should return False"
+    assert not await valid_password(user_db_transaction, "username", None), \
+        "None password should return False"
+    assert not await valid_password(user_db_transaction, None, None), \
+        "None username and password should return False"
 
 
 @pytest.mark.user_creation
@@ -92,12 +102,12 @@ async def test_get_user_by_id(user_db_transaction):
     # Get user by ID
     user = await get_user_by_id(user_db_transaction, user_id)
     
-    assert user is not None
-    assert user['user_id'] == user_id
-    assert user['username'] == "id_test_user"
-    assert user['email'] == "id@test.com"
-    assert user['lastname'] == "TestLast"
-    assert user['firstname'] == "TestFirst"
+    assert user is not None, f"User with ID {user_id} should be found"
+    assert user['user_id'] == user_id, "User ID should match"
+    assert user['username'] == "id_test_user", f"Username should be 'id_test_user', got '{user['username']}'"
+    assert user['email'] == "id@test.com", f"Email should be 'id@test.com', got '{user['email']}'"
+    assert user['lastname'] == "TestLast", f"Last name should be 'TestLast', got '{user['lastname']}'"
+    assert user['firstname'] == "TestFirst", f"First name should be 'TestFirst', got '{user['firstname']}'"
 
 
 @pytest.mark.user_creation
@@ -107,7 +117,7 @@ async def test_get_user_by_id_not_found(user_db_transaction):
     from uuid import uuid4
     non_existent_id = uuid4()
     user = await get_user_by_id(user_db_transaction, non_existent_id)
-    assert user is None
+    assert user is None, f"Non-existent user ID {non_existent_id} should return None"
 
 
 @pytest.mark.user_creation
@@ -127,9 +137,9 @@ async def test_get_user_by_username(user_db_transaction):
     # Get user by username
     user = await get_user_by_username(user_db_transaction, "username_test_user")
     
-    assert user is not None
-    assert user['user_id'] == user_id
-    assert user['username'] == "username_test_user"
+    assert user is not None, "User with username 'username_test_user' should be found"
+    assert user['user_id'] == user_id, "User ID should match"
+    assert user['username'] == "username_test_user", "Username should match"
 
 
 @pytest.mark.user_creation
@@ -137,7 +147,7 @@ async def test_get_user_by_username(user_db_transaction):
 async def test_get_user_by_username_not_found(user_db_transaction):
     """Test retrieving non-existent user by username."""
     user = await get_user_by_username(user_db_transaction, "nonexistent_username")
-    assert user is None
+    assert user is None, "Non-existent username should return None"
 
 
 @pytest.mark.user_creation
@@ -156,14 +166,14 @@ async def test_delete_user(user_db_transaction):
     
     # Verify user exists
     user = await get_user_by_id(user_db_transaction, user_id)
-    assert user is not None
+    assert user is not None, "User should exist before deletion"
     
     # Delete user
     await delete_user(user_db_transaction, user_id)
     
     # Verify user is deleted
     user = await get_user_by_id(user_db_transaction, user_id)
-    assert user is None
+    assert user is None, f"User {user_id} should be deleted"
 
 
 @pytest.mark.user_creation
@@ -191,8 +201,8 @@ async def test_add_user_to_team(user_db_transaction):
         'SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2',
         user_id, team_id
     )
-    assert result is not None
-    assert result['role'] == "member"
+    assert result is not None, f"User {user_id} should be added to team {team_id}"
+    assert result['role'] == "member", f"User role should be 'member', got '{result['role']}'"
 
 
 @pytest.mark.user_creation
@@ -220,7 +230,7 @@ async def test_remove_user_from_team(user_db_transaction):
         'SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2',
         user_id, team_id
     )
-    assert result is not None
+    assert result is not None, "User should be in team before removal"
     
     # Remove user from team
     await remove_user_from_team(user_db_transaction, user_id, team_id)
@@ -230,7 +240,7 @@ async def test_remove_user_from_team(user_db_transaction):
         'SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2',
         user_id, team_id
     )
-    assert result is None
+    assert result is None, f"User {user_id} should be removed from team {team_id}"
 
 
 @pytest.mark.user_creation
