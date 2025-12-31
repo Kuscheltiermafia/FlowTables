@@ -1,11 +1,15 @@
+import uuid
+from uuid import UUID
+
 import asyncpg
 from asyncpg import Connection
 
-async def create_team(user_connection:Connection, team_name: str) -> int:
+async def create_team(user_connection:Connection, team_name: str) -> UUID:
 
-    team_id = await user_connection.fetchval(
-        'INSERT INTO teams (team_name) VALUES ($1) RETURNING team_id',
-        team_name
+    team_id = uuid.uuid4()
+    await user_connection.execute(
+        'INSERT INTO teams (team__id, team_name) VALUES ($1, $2)',
+        team_id, team_name
     )
     return team_id
 
