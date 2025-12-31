@@ -40,7 +40,7 @@ async def get_project_name(user_connection:Connection, project_id: UUID) -> str 
 
 async def delete_project(user_connection:Connection, data_connection:Connection, project_id: UUID):
     await data_connection.execute(f'DROP SCHEMA IF EXISTS "{project_id}" CASCADE')
-    await data_connection.execute(f'DROP SCHEMA IF EXISTS permissions."{project_id}" CASCADE')
+    await user_connection.execute(f'DROP TABLE IF EXISTS permissions."{project_id}" CASCADE')
     await user_connection.execute('DELETE FROM projects WHERE project_id = $1', project_id)
     await user_connection.execute('DELETE FROM project_members WHERE project_id = $1', project_id)
     await user_connection.execute('DELETE FROM project_teams WHERE project_id = $1', project_id)
