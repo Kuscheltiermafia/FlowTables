@@ -11,7 +11,7 @@ async def create_project(user_connection:Connection, data_connection:Connection,
 
     await data_connection.execute(f'CREATE SCHEMA "{project_id}"')
     await user_connection.execute('INSERT INTO projects (project_id, project_name, owner_id) VALUES ($1, $2, $3)', project_id, project_name, owner_id)
-    await user_connection.execute('INSERT INTO project_members (project_id, user_id, permission) VALUES ($1, $2, $3::json)', project_id, owner_id, json.dumps({"temp": "owner"}))
+    await user_connection.execute('INSERT INTO project_members (project_id, user_id, role) VALUES ($1, $2, $3)', project_id, owner_id, 'owner')
 
     await user_connection.execute(f'''CREATE TABLE IF NOT EXISTS permissions."{project_id}" (
         table_id UUID,
