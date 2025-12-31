@@ -5,7 +5,7 @@ import pytest
 from conftest import user_db_transaction
 from backend.user_management.team_handler import create_team
 from backend.data_management.project_handler import create_project, get_project_name, project_exists, add_member, \
-    list_project_members, change_member_permission, remove_member, delete_project, list_user_projects
+    list_project_members, change_member_role, remove_member, delete_project, list_user_projects
 from backend.user_management.user_handler import create_user
 
 
@@ -41,11 +41,11 @@ async def test_setup_project(user_db_transaction, data_db_transaction):
         firstName="Project"
     )
 
-    await add_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, permission={"temp": "member"})
+    await add_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, permission="editor")
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
     print(members)
     assert any(member['user_id'] == user2_id and json.loads(member['permission']) == {"temp": "member"} for member in members)
-    await change_member_permission(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, new_permission={"temp": "moderator"})
+    await change_member_role(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, new_permission="moderator")
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
     assert any(member['user_id'] == user2_id and json.loads(member['permission']) == {"temp": "moderator"} for member in members)
 
