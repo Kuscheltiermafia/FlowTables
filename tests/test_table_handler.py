@@ -69,7 +69,7 @@ async def test_create_table_duplicate(user_db_transaction, data_db_transaction):
     await create_table(data_db_transaction, table_name, str(project_id))
     
     # Try to create the same table again
-    with pytest.raises(ValueError, match=f"Table {table_name} already exists"):
+    with pytest.raises(ValueError, match=f"Table {table_name} already exists in schema"):
         await create_table(data_db_transaction, table_name, str(project_id))
 
 
@@ -107,8 +107,8 @@ async def test_delete_table(user_db_transaction, data_db_transaction):
     table_name = "delete_test_table"
     await create_table(data_db_transaction, table_name, str(project_id))
     
-    # Delete the table
-    await delete_table(user_db_transaction, data_db_transaction, table_name, uuid4())  # table_id as UUID
+    # Delete the table (using project_id as table_id parameter)
+    await delete_table(user_db_transaction, data_db_transaction, table_name, UUID(project_id) if isinstance(project_id, str) else project_id)
     
     # Verify table was deleted
     result = await data_db_transaction.fetch(
