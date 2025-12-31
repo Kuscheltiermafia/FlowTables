@@ -41,13 +41,13 @@ async def test_setup_project(user_db_transaction, data_db_transaction):
         firstName="Project"
     )
 
-    await add_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, permission="editor")
+    await add_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, role="editor")
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
     print(members)
-    assert any(member['user_id'] == user2_id and json.loads(member['permission']) == {"temp": "member"} for member in members)
-    await change_member_role(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, new_permission="moderator")
+    assert any(member['user_id'] == user2_id and json.loads(member['role']) == {"temp": "member"} for member in members)
+    await change_member_role(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id, new_role="moderator")
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
-    assert any(member['user_id'] == user2_id and json.loads(member['permission']) == {"temp": "moderator"} for member in members)
+    assert any(member['user_id'] == user2_id and json.loads(member['role']) == {"temp": "moderator"} for member in members)
 
     await remove_member(user_connection=user_db_transaction, project_id=project_id, user_id=user2_id)
     members = await list_project_members(user_connection=user_db_transaction, project_id=project_id)
