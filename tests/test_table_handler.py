@@ -1,5 +1,5 @@
 import pytest
-from uuid import uuid4
+from uuid import uuid4, UUID
 from backend.data_management.table_handler import (
     create_table, delete_table, set_cell_value, get_cell_value,
     set_permission, get_all_user_permissions, delete_all_user_permissions,
@@ -11,7 +11,6 @@ from backend.user_management.user_handler import create_user
 
 @pytest.mark.data_db
 @pytest.mark.asyncio
-@pytest.mark.data_db
 async def test_create_table(user_db_transaction, data_db_transaction):
     """Test creating a table in a project schema."""
     # Create a test user and project
@@ -288,13 +287,13 @@ async def test_set_permission(user_db_transaction, data_db_transaction):
     
     # Set permission
     await set_permission(
-        user_db_transaction, uuid4() if isinstance(project_id, str) else project_id,
+        user_db_transaction, UUID(project_id) if isinstance(project_id, str) else project_id,
         table_id, user2_id, 0, 10, 0, 10, "read"
     )
     
     # Verify permission was set
     perms = await get_all_user_permissions(
-        user_db_transaction, uuid4() if isinstance(project_id, str) else project_id,
+        user_db_transaction, UUID(project_id) if isinstance(project_id, str) else project_id,
         table_id, user2_id
     )
     assert len(perms) > 0
@@ -332,7 +331,7 @@ async def test_update_permission(user_db_transaction, data_db_transaction):
     )
     
     table_id = uuid4()
-    proj_uuid = uuid4() if isinstance(project_id, str) else project_id
+    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set initial permission
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 10, 0, 10, "read")
@@ -377,7 +376,7 @@ async def test_get_all_user_permissions(user_db_transaction, data_db_transaction
     )
     
     table_id = uuid4()
-    proj_uuid = uuid4() if isinstance(project_id, str) else project_id
+    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set multiple permissions
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 5, 0, 5, "read")
@@ -422,7 +421,7 @@ async def test_delete_all_user_permissions(user_db_transaction, data_db_transact
     )
     
     table_id = uuid4()
-    proj_uuid = uuid4() if isinstance(project_id, str) else project_id
+    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set permissions
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 5, 0, 5, "read")
@@ -471,7 +470,7 @@ async def test_delete_permission_range(user_db_transaction, data_db_transaction)
     )
     
     table_id = uuid4()
-    proj_uuid = uuid4() if isinstance(project_id, str) else project_id
+    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set multiple permissions
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 5, 0, 5, "read")
