@@ -18,4 +18,4 @@ This will be available as App and as Website for easy access.
 Clone this repository
 
 Run
-´´´ python -m uvicorn Main:app --host 0.0.0.0 --port 8000 --reload ´´´
+`python -m uvicorn Main:app --reload`
