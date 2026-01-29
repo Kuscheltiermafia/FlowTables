@@ -10,25 +10,15 @@ from backend.data_management.table_handler import (
     set_permission, get_all_user_permissions, delete_all_user_permissions,
     delete_permission_range
 )
-from backend.data_management.project_handler import create_project
 from backend.user_management.user_handler import create_user
 
 
 @pytest.mark.table_permissions
 @pytest.mark.data_db
 @pytest.mark.asyncio
-async def test_set_permission(user_db_transaction, data_db_transaction):
+async def test_set_permission(user_db_transaction, data_db_transaction, test_user, test_project):
     """Test setting permissions for a user on a table."""
-    # Create test users and project
-    user_id = await create_user(
-        user_connection=user_db_transaction,
-        userName="perm_owner_user",
-        email="perm_owner@test.com",
-        password="SecurePass123!",
-        lastName="PermOwner",
-        firstName="Test"
-    )
-    
+    # Use test_user from fixture, create a second user
     user2_id = await create_user(
         user_connection=user_db_transaction,
         userName="perm_user",
@@ -38,24 +28,19 @@ async def test_set_permission(user_db_transaction, data_db_transaction):
         firstName="User"
     )
     
-    project_id = await create_project(
-        user_connection=user_db_transaction,
-        data_connection=data_db_transaction,
-        project_name="Permission Test Project",
-        owner_id=user_id
-    )
-    
+    # Use test_project from fixture
+    project_id = UUID(test_project) if isinstance(test_project, str) else test_project
     table_id = uuid4()
     
     # Set permission
     await set_permission(
-        user_db_transaction, UUID(project_id) if isinstance(project_id, str) else project_id,
+        user_db_transaction, project_id,
         table_id, user2_id, 0, 10, 0, 10, "read"
     )
     
     # Verify permission was set
     perms = await get_all_user_permissions(
-        user_db_transaction, UUID(project_id) if isinstance(project_id, str) else project_id,
+        user_db_transaction, project_id,
         table_id, user2_id
     )
     assert len(perms) > 0, f"User {user2_id} should have at least one permission"
@@ -66,18 +51,9 @@ async def test_set_permission(user_db_transaction, data_db_transaction):
 @pytest.mark.table_permissions
 @pytest.mark.data_db
 @pytest.mark.asyncio
-async def test_update_permission(user_db_transaction, data_db_transaction):
+async def test_update_permission(user_db_transaction, data_db_transaction, test_user, test_project):
     """Test updating an existing permission."""
-    # Create test users and project
-    user_id = await create_user(
-        user_connection=user_db_transaction,
-        userName="update_perm_owner",
-        email="update_perm_owner@test.com",
-        password="SecurePass123!",
-        lastName="UpdatePermOwner",
-        firstName="Test"
-    )
-    
+    # Use test_user from fixture, create a second user
     user2_id = await create_user(
         user_connection=user_db_transaction,
         userName="update_perm_user",
@@ -87,15 +63,9 @@ async def test_update_permission(user_db_transaction, data_db_transaction):
         firstName="User"
     )
     
-    project_id = await create_project(
-        user_connection=user_db_transaction,
-        data_connection=data_db_transaction,
-        project_name="Update Perm Test",
-        owner_id=user_id
-    )
-    
+    # Use test_project from fixture
+    proj_uuid = UUID(test_project) if isinstance(test_project, str) else test_project
     table_id = uuid4()
-    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set initial permission
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 10, 0, 10, "read")
@@ -113,18 +83,9 @@ async def test_update_permission(user_db_transaction, data_db_transaction):
 @pytest.mark.table_permissions
 @pytest.mark.data_db
 @pytest.mark.asyncio
-async def test_get_all_user_permissions(user_db_transaction, data_db_transaction):
+async def test_get_all_user_permissions(user_db_transaction, data_db_transaction, test_user, test_project):
     """Test getting all permissions for a user."""
-    # Create test users and project
-    user_id = await create_user(
-        user_connection=user_db_transaction,
-        userName="get_perm_owner",
-        email="get_perm_owner@test.com",
-        password="SecurePass123!",
-        lastName="GetPermOwner",
-        firstName="Test"
-    )
-    
+    # Use test_user from fixture, create a second user
     user2_id = await create_user(
         user_connection=user_db_transaction,
         userName="get_perm_user",
@@ -134,15 +95,9 @@ async def test_get_all_user_permissions(user_db_transaction, data_db_transaction
         firstName="User"
     )
     
-    project_id = await create_project(
-        user_connection=user_db_transaction,
-        data_connection=data_db_transaction,
-        project_name="Get Perm Test",
-        owner_id=user_id
-    )
-    
+    # Use test_project from fixture
+    proj_uuid = UUID(test_project) if isinstance(test_project, str) else test_project
     table_id = uuid4()
-    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set multiple permissions
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 5, 0, 5, "read")
@@ -161,18 +116,9 @@ async def test_get_all_user_permissions(user_db_transaction, data_db_transaction
 @pytest.mark.table_permissions
 @pytest.mark.data_db
 @pytest.mark.asyncio
-async def test_delete_all_user_permissions(user_db_transaction, data_db_transaction):
+async def test_delete_all_user_permissions(user_db_transaction, data_db_transaction, test_user, test_project):
     """Test deleting all permissions for a user."""
-    # Create test users and project
-    user_id = await create_user(
-        user_connection=user_db_transaction,
-        userName="del_all_perm_owner",
-        email="del_all_perm_owner@test.com",
-        password="SecurePass123!",
-        lastName="DelAllPermOwner",
-        firstName="Test"
-    )
-    
+    # Use test_user from fixture, create a second user
     user2_id = await create_user(
         user_connection=user_db_transaction,
         userName="del_all_perm_user",
@@ -182,15 +128,9 @@ async def test_delete_all_user_permissions(user_db_transaction, data_db_transact
         firstName="User"
     )
     
-    project_id = await create_project(
-        user_connection=user_db_transaction,
-        data_connection=data_db_transaction,
-        project_name="Del All Perm Test",
-        owner_id=user_id
-    )
-    
+    # Use test_project from fixture
+    proj_uuid = UUID(test_project) if isinstance(test_project, str) else test_project
     table_id = uuid4()
-    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set permissions
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 5, 0, 5, "read")
@@ -211,18 +151,9 @@ async def test_delete_all_user_permissions(user_db_transaction, data_db_transact
 @pytest.mark.table_permissions
 @pytest.mark.data_db
 @pytest.mark.asyncio
-async def test_delete_permission_range(user_db_transaction, data_db_transaction):
+async def test_delete_permission_range(user_db_transaction, data_db_transaction, test_user, test_project):
     """Test deleting a specific permission range."""
-    # Create test users and project
-    user_id = await create_user(
-        user_connection=user_db_transaction,
-        userName="del_range_perm_owner",
-        email="del_range_perm_owner@test.com",
-        password="SecurePass123!",
-        lastName="DelRangePermOwner",
-        firstName="Test"
-    )
-    
+    # Use test_user from fixture, create a second user
     user2_id = await create_user(
         user_connection=user_db_transaction,
         userName="del_range_perm_user",
@@ -232,15 +163,9 @@ async def test_delete_permission_range(user_db_transaction, data_db_transaction)
         firstName="User"
     )
     
-    project_id = await create_project(
-        user_connection=user_db_transaction,
-        data_connection=data_db_transaction,
-        project_name="Del Range Perm Test",
-        owner_id=user_id
-    )
-    
+    # Use test_project from fixture
+    proj_uuid = UUID(test_project) if isinstance(test_project, str) else test_project
     table_id = uuid4()
-    proj_uuid = UUID(project_id) if isinstance(project_id, str) else project_id
     
     # Set multiple permissions
     await set_permission(user_db_transaction, proj_uuid, table_id, user2_id, 0, 5, 0, 5, "read")
