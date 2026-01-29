@@ -83,9 +83,41 @@ Common test fixtures are defined in `conftest.py`:
 
 - `user_db_transaction` - User database connection with transaction rollback
 - `data_db_transaction` - Data database connection with transaction rollback
-- `test_user` - Creates a test user for use in tests
-- `test_project` - Creates a test project with a test user
-- `test_table` - Creates a test table in a test project
+- `test_user` - Creates a test user for use in tests (uses `user_db_transaction`)
+- `test_project` - Creates a test project with a test user (uses `test_user`)
+- `test_table` - Creates a test table in a test project (uses `test_project`)
+
+### When to Use Fixtures vs Manual Creation
+
+**Use fixtures when:**
+- Your test needs a basic user, project, or table for testing other functionality
+- The specific properties of the user/project/table don't matter
+- You want to reduce boilerplate setup code
+- Example: Testing cell operations on a table
+
+**Create manually when:**
+- Testing user/team/project creation functions themselves
+- The test requires specific user properties or multiple users
+- The test needs to verify creation behavior with specific parameters
+- Example: Testing user creation validation or duplicate handling
+
+### Example: Using Fixtures
+
+```python
+@pytest.mark.table_operations
+@pytest.mark.data_db
+@pytest.mark.asyncio
+async def test_set_and_get_cell_value(data_db_transaction, test_table):
+    """Test setting and getting cell values."""
+    # Use test_table fixture - no need to create user, project, or table
+    table_name, project_id = test_table
+    
+    # Focus on testing cell operations
+    await set_cell_value(data_db_transaction, project_id, table_name, 1, 1, "Test Value")
+    value = await get_cell_value(data_db_transaction, project_id, table_name, 1, 1)
+    
+    assert value == "Test Value", f"Cell value should be 'Test Value', got '{value}'"
+```
 
 ## Writing Tests
 
