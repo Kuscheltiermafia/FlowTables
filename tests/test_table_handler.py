@@ -5,7 +5,7 @@ from backend.data_management.table_handler import (
     set_permission, get_all_user_permissions, delete_all_user_permissions,
     delete_permission_range
 )
-from backend.data_management.project_handler import create_project, delete_project
+from backend.data_management.project_handler import create_project
 from backend.user_management.user_handler import create_user
 
 
