@@ -3,7 +3,15 @@ from uuid import UUID
 from asyncpg import Connection
 
 
-async def create_table(data_connection: Connection, table_name: str, schema: str):
+async def create_table(data_connection: Connection, table_name: str, project_id: UUID):
+    """Create a table in a project schema.
+    
+    Args:
+        data_connection: Database connection
+        table_name: Name of the table to create
+        project_id: UUID of the project (used as schema name)
+    """
+    schema = str(project_id)
     existing_tables = await data_connection.fetch('''
         SELECT tablename FROM pg_tables WHERE schemaname = $1 AND tablename = $2
     ''', schema, table_name)
@@ -27,7 +35,18 @@ async def delete_table(user_connection: Connection, data_connection: Connection,
     await data_connection.execute(f'''DROP TABLE IF EXISTS "{project_id}"."{table_name}" CASCADE''')
     await user_connection.execute(f'''DELETE FROM permissions."{project_id}" WHERE table_id = $1''', table_name)
 
-async def set_cell_value(data_connection: Connection, schema: str, table_name: str, row: int, col: int, value: str):
+async def set_cell_value(data_connection: Connection, project_id: UUID, table_name: str, row: int, col: int, value: str):
+    """Set or update a cell value in a table.
+    
+    Args:
+        data_connection: Database connection
+        project_id: UUID of the project (used as schema name)
+        table_name: Name of the table
+        row: Row index
+        col: Column index
+        value: Value to set (empty string deletes the cell)
+    """
+    schema = str(project_id)
     if not value:
         await data_connection.execute(f'''DELETE FROM "{schema}"."{table_name}" WHERE row_index = $1 AND col_index = $2''', row, col)
     else:
@@ -38,7 +57,20 @@ async def set_cell_value(data_connection: Connection, schema: str, table_name: s
             DO UPDATE SET value = EXCLUDED.value
         ''', row, col, value)
 
-async def get_cell_value(data_connection: Connection, schema: str, table_name: str, row: int, col: int) -> str | None:
+async def get_cell_value(data_connection: Connection, project_id: UUID, table_name: str, row: int, col: int) -> str | None:
+    """Get a cell value from a table.
+    
+    Args:
+        data_connection: Database connection
+        project_id: UUID of the project (used as schema name)
+        table_name: Name of the table
+        row: Row index
+        col: Column index
+        
+    Returns:
+        The cell value or None if not found
+    """
+    schema = str(project_id)
     result = await data_connection.fetchrow(f'''
         SELECT value FROM "{schema}"."{table_name}" WHERE row_index = $1 AND col_index = $2
     ''', row, col)
